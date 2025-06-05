@@ -474,7 +474,15 @@ func (l *DHCPLease) Routes() []*types.Route {
 	opt121Routes := ack.ClasslessStaticRoute()
 	if len(opt121Routes) > 0 {
 		for _, r := range opt121Routes {
-			routes = append(routes, &types.Route{Dst: *r.Dest, GW: r.Router})
+			var route *types.Route
+			// When router unspecified, set to link scoped
+			if r.Router.IsUnspecified(){
+                        	scopeLinkValue := int(netlink.SCOPE_LINK)
+                                route = &types.Route{Dst: *r.Dest, GW: nil, Scope: &scopeLinkValue}
+                        } else {
+                                route = &types.Route{Dst: *r.Dest, GW: r.Router}
+                        }
+                        routes = append(routes, route)
 		}
 		return routes
 	}
