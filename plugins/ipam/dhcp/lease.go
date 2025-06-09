@@ -475,12 +475,12 @@ func (l *DHCPLease) Routes() []*types.Route {
 	if len(opt121Routes) > 0 {
 		for _, r := range opt121Routes {
 			var route *types.Route
+			route = &types.Route{Dst: *r.Dest, GW: r.Router}
+
 			// When router unspecified, set to link scoped
 			if r.Router.IsUnspecified(){
-                        	scopeLinkValue := int(netlink.SCOPE_LINK)
-                                route = &types.Route{Dst: *r.Dest, GW: nil, Scope: &scopeLinkValue}
-                        } else {
-                                route = &types.Route{Dst: *r.Dest, GW: r.Router}
+				scopeLinkValue := int(netlink.SCOPE_LINK)
+				route.Scope = &scopeLinkValue
                         }
                         routes = append(routes, route)
 		}
